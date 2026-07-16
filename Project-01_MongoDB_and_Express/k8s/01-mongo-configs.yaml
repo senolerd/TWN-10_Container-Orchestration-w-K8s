@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-config
+data:
+  ME_CONFIG_BASICAUTH_ENABLED: "true"
+  mongodb_root_username: "root"
+  mongo_express_username: "mongoexpressuser"
+  mongodb_port: "27017"
+  mondodb_url: ""
+  mongodb_server: "127.0.0.1"

@@ -1,0 +1,23 @@
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-express
+  namespace: mongo-sts-test
+spec:
+  selector:
+    matchLabels:
+      app: mongo-express
+  template:
+    metadata:
+      labels:
+        app: mongo-express
+    spec:
+      containers:
+      - name: mongo-express-container
+        image: docker.io/mongo-express:1.0.2-20-alpine3.19
+        ports:
+        - containerPort: 8081
+        env:
+        - name: "ME_CONFIG_MONGODB_URL"
+          value: "mongodb://mongo-standalone-0.mongodb-headless.mongo-sts-test" # default quick login: admin/pass

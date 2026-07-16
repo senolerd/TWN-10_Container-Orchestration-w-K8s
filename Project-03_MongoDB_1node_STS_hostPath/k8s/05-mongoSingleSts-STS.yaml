@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-standalone
+  namespace: mongo-sts-test
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  serviceName: mongodb-headless
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      volumes:
+      - name: hostpath-pvc
+        persistentVolumeClaim:
+          claimName: hostpath-pvc-1
+
+      initContainers:
+      - name: volume-permission-fix
+        image: docker.io/mongo:7
+        command: 
+        - sh  
+        - -c
+        - |
+          chown 999:999 -R /data
+          chmod 750 -R /data
+        volumeMounts:
+        - name: hostpath-pvc
+          mountPath: /data/db
+          subPath: mongodb-data
+        - name: hostpath-pvc
+          mountPath: /data/configdb
+          subPath: mongodb-config
+      containers:
+      - name: mongo7
+        securityContext:
+          runAsGroup: 999
+          runAsUser: 999
+        image: docker.io/mongo:7
+        ports:
+        - containerPort: 27017
+          name: mongodb-port
+        volumeMounts:
+        - name: hostpath-pvc
+          mountPath: /data/db
+          subPath: mongodb-data
+        - name: hostpath-pvc
+          mountPath: /data/configdb
+          subPath: mongodb-config
