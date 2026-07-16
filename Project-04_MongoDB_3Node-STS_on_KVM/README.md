@@ -1,12 +1,15 @@
 
-### 3 Node MongoDB cluster and Mongo Express over KVM local K8s cluster 
+# 3 Node MongoDB cluster and Mongo Express over KVM local K8s cluster 
 
-[[[ STAGE 1 PREPARE NFS ]]]
+### [[[ STAGE 1 PREPARE NFS ]]]
 NFS server is on dedicated NFS server
 
   $ sudo dnf install -y nfs-utils
+
   $ sudo mkdir -p /exports/mongo-{1,2,3}
+
   $ sudo chown 999:999 /exports/mongo-{1,2,3} # MongoDB will use mongodb user with 999:999 as UID:GID
+  
   $ sudo chmod 0750 /exports/mongo-{1,2,3}
 
 - /etc/exports file content for 192.168.1.0/24 network. Assumme the k8s worker nodes has access to this network
