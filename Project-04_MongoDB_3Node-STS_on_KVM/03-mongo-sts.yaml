@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-sts
+spec:
+  serviceName: mongodb-headless
+  selector:
+    matchLabels:
+      app: mongo
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      volumes:
+      - name: rs-auth-keyfile-vol
+        secret:
+          secretName: mongo-rs-auth-keyfile
+          items:
+            - key: auth-key
+              path: auth-key
+      - name: fixed-keyfile-vol
+        emptyDir: {}
+      initContainers:
+      - name: keyfile-permisson-fix
+        image: docker.io/mongo:7
+        command: 
+          - sh
+          - -c
+          - |
+              cp /secret/auth-key /fixed-secret/auth-key
+              chown 999:999 /fixed-secret/auth-key
+              chmod 400 /fixed-secret/auth-key
+        volumeMounts:
+          - name: rs-auth-keyfile-vol
+            mountPath: /secret
+          - name: fixed-keyfile-vol
+            mountPath: /fixed-secret
+      containers:
+      - name: mongo-db
+        image: docker.io/mongo:7
+        args: ["mongod", "--replSet", "rs0", "--bind_ip_all",  "--keyFile", "/etc/mongo-keyfile/auth-key"]
+        # command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
+        ports:
+        - containerPort: 80
+          name: web
+        env:
+          - name: "MONGO_INITDB_ROOT_USERNAME"
+            valueFrom:
+              secretKeyRef:
+                name: mongo-secrets
+                key: "MONGO_INITDB_ROOT_USERNAME"
+          - name: "MONGO_INITDB_ROOT_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: mongo-secrets
+                key: "MONGO_INITDB_ROOT_PASSWORD"
+        volumeMounts:
+        - name: mongo-data
+          mountPath: /data/db
+        - name: fixed-keyfile-vol
+          mountPath: /etc/mongo-keyfile/
+        
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

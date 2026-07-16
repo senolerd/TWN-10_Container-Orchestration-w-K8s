@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mosquitto-admin-pw
+type: Opaque
+stringData:
+  # Example credential is admin:admin. Use create_credentials.sh to create creative credentials. 
+  passwd-file: |
+    admin:$7$101$JStajGAGbjIWzY/Z$qBfDW+1pW9YCLIAU3OZDMHyld2ua/98XaBGffxfcAyfugpsDoyIeS9CYHD/BpVkssa2IzIgvURnXP3o8OQHMuA==

@@ -1,0 +1,83 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+spec:
+  selector:
+    matchLabels:
+      server: mosquitto
+  template:
+    metadata:
+      labels:
+        server: mosquitto
+    spec:
+      securityContext:
+        runAsUser: 1883       
+        runAsGroup: 1883     
+        fsGroup: 1883     
+      volumes:
+        - name: mosqitto-conf-vol
+          configMap:
+            name: mosquitto-config
+            items: 
+              - key: mosquitto-conf
+                path: mosquitto.conf
+        - name: mosquitto-passwd # for copying content to emptyDir
+          secret:
+            secretName: mosquitto-admin-pw
+            items:
+            - key: passwd-file
+              path: passwd
+        - name: passwd-writeable
+          emptyDir: {}
+
+      initContainers:
+      - name: change-passws-file
+        # Why this initial container is exist:
+        # Container is starting with root user but the binary is set to start with 
+        # mosquitto (1883:1883) user. Since configMap/Secret are mounted with root user to container,
+        # mosquitto daemon log is complaining about the file owner. So satisfy daemon, the passwd file'
+        # owner should be mosquitto. To make this possible a initialContainer is being used. The secret 
+        # and emptyDir volumes are getting mounted to this container, then the passwd file from secret 
+        # copied to emptyDir. Then, the new files permission is being set ro mosquitto' UID:GID with mode.
+        # While initialContainer is working, app container is waiting its run order until initalContainers are
+        # done and quit their job. Then, the app container (in this case, mosquitto) starts and mount emptyDir,
+        # so adjusted passwd file. This solution way is practised to not interfere image' original 
+        # booting sequence of docker-entrypoint.sh
+        image: eclipse-mosquitto:openssl
+        command: 
+          - sh
+          - -c
+          - |
+              cp /secret/passwd /passwd-writeable/passwd
+              chown 1883:1883 /passwd-writeable/passwd
+              chmod 0600 /passwd-writeable/passwd
+        volumeMounts:
+          - name: mosquitto-passwd
+            mountPath: /secret
+          - name:  passwd-writeable
+            mountPath: /passwd-writeable
+      containers:
+      - name: mosquitto-container
+        image: eclipse-mosquitto:openssl
+        securityContext:
+          runAsUser: 1883
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+        ports:
+        - name: mqtt-notls
+          containerPort: 1883 #Unencrypted Listener (Local or LAN)
+          protocol: TCP
+        - name: mqtt-ws
+          containerPort: 9001 #WebSockets Listener (Useful for web dashboard clients)
+          protocol: TCP
+        volumeMounts:
+          - name: mosqitto-conf-vol
+            mountPath: /mosquitto/config/mosquitto.conf
+            subPath: mosquitto.conf 
+          - name: passwd-writeable
+            mountPath: /mosquitto/passwd
+            subPath: passwd
