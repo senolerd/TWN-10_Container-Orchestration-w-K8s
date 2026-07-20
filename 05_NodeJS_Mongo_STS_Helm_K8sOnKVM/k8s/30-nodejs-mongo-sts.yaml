@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nodejs-mongo
+spec:
+  selector:
+    matchLabels:
+      app: nodejs-mongo
+  serviceName: nodejs-mongo-headless
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nodejs-mongo
+    spec:
+      imagePullSecrets:
+      - name: registry-secret-for-alkol
+      volumes:
+        - name: ebs-storage
+          PersistentVolumeClaim:
+            claimName: auto-ebs-sc
+      containers:
+      - name: nodejs-mongo
+        image: docker.io/alkol/nodejs-mongodb:v7
+        ports:
+        - containerPort: 3000
+          name: web
+        volumeMounts:
+          - name: ebs-storage
+            mountPath: /ebs
+      - name: mongo7
+        securityContext:
+          runAsGroup: 999
+          runAsUser: 999
+        image: docker.io/mongo:7
+        env: 
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: admin
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: password
+        ports:
+        - containerPort: 27017
+          name: mongodb-port
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-mongo-headless
+spec:
+  # clusterIP: None
+  type: NodePort
+  selector:
+    app: nodejs-mongo
+  ports:
+  - port: 3000
+    targetPort: 3000
+    nodePort: 31080
+
+

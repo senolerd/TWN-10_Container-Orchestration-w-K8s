@@ -1,0 +1,19 @@
+# building with development image from chainguard
+FROM cgr.dev/chainguard/node:latest-dev as BUILDER
+WORKDIR /app
+COPY app/package.json .
+RUN npm install
+COPY app .
+
+# final image with latest slim nodejs image from chainguard
+#the final image still needs CVE check after module install, anyway
+FROM cgr.dev/chainguard/node:latest
+WORKDIR /app
+COPY --from=BUILDER --chown=node:node /app .
+EXPOSE 3000
+# chainguard image's entrypoint is /usr/bin/node and doesn't run init. 
+# Without init the container dies a little weird. Adding entry point 
+# solves at Containerfile. Instead, adding --init to container runner command
+# does same effect.
+ENTRYPOINT [ "dumb-init", "--", "/usr/bin/node" ]
+CMD ["server.js"] 

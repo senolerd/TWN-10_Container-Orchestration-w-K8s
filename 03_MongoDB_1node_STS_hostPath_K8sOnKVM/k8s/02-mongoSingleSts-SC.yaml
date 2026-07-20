@@ -5,3 +5,4 @@ metadata:
   name: manual-hostpath
 provisioner: kubernetes.io/no-provisioner # Indicates manual PV creation
 volumeBindingMode: WaitForFirstConsumer 
+

@@ -1,4 +1,4 @@
-## Mosquitto Message Broker over K8s
+## Mosquitto Message Broker over KVM/K8s
 
 A quick Mosquitto Message Broker deployment over K8s. Credential customization can be done via create_credentials.sh script file.
 For testing purpose it listens no-tls port (31883) and websocket (31885) with Nodeport.

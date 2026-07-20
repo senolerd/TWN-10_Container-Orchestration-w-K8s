@@ -5,9 +5,9 @@ metadata:
   name: hostpath-pvc-1
   namespace: mongo-sts-test
 spec:
+  storageClassName: manual-hostpath
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
-  storageClassName: manual-hostpath
