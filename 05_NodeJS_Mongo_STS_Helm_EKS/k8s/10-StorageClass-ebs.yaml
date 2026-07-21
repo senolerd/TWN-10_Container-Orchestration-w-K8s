@@ -1,0 +1,13 @@
+# gp3 SC instead default SC comes with Amazon EBS CSI driver for Hybrid Mode 
+# (EKS Auto Mode use different driver and provisioner)
+# ---
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: ebs-gp3
+# # provisioner: ebs.csi.aws.com
+# volumeBindingMode: WaitForFirstConsumer
+# allowVolumeExpansion: true
+# parameters:
+#   type: gp3
+#   fsType: ext4

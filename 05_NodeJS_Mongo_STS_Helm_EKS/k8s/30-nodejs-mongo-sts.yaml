@@ -15,24 +15,33 @@ spec:
     spec:
       imagePullSecrets:
       - name: registry-secret-for-alkol
-      volumes:
-        - name: ebs-storage
-          PersistentVolumeClaim:
-            claimName: auto-ebs-sc
+      initContainers:
+      # Change mount directory owner to UID: 999 (mongodb) to be used by
+      # mongodb daemon in the mongodb container.
+      - name: fix-volume-permission
+        image: busybox
+        volumeMounts:
+          - name: data-disk
+            mountPath: /data/db 
+        command: 
+        - sh
+        - -c
+        - |
+          chown 999:999 -R /data/db
+          chmod 700 -R /data/db
+          touch /data/db/.perm_fixed
       containers:
       - name: nodejs-mongo
         image: docker.io/alkol/nodejs-mongodb:v7
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
           name: web
-        volumeMounts:
-          - name: ebs-storage
-            mountPath: /ebs
       - name: mongo7
         securityContext:
           runAsGroup: 999
           runAsUser: 999
-        image: docker.io/mongo:7
+        image: docker.io/mongo:7    
         env: 
           - name: MONGO_INITDB_ROOT_USERNAME
             value: admin
@@ -41,20 +50,31 @@ spec:
         ports:
         - containerPort: 27017
           name: mongodb-port
-        
+        volumeMounts:
+          - name: data-disk
+            mountPath: /data/db     
+  volumeClaimTemplates:
+  - metadata:
+      name: data-disk
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "gp2" # gp2 comes with aws-ebs-csi-driver addon installation in EKS hybrid mode (mean, EKS Auto Mode: Disabled )
+      resources:
+        requests:
+          storage: 5Gi 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: nodejs-mongo-headless
 spec:
-  # clusterIP: None
-  type: NodePort
+  clusterIP: None
+  # type: NodePort
   selector:
     app: nodejs-mongo
   ports:
   - port: 3000
     targetPort: 3000
-    nodePort: 31080
+    # nodePort: 31080
 
 
