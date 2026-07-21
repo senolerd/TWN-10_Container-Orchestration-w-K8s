@@ -20,7 +20,7 @@ VPC CNI + prefix delegation STS to internet-facing traffic via Gateway API + ALB
 ### 1.1 Apply Pod Identity Agent to EKS cluster
 
     <!-- If prefering to install Pod Identity Agent via console. -->
-    `aws eks create-addon --cluster-name {CLUSTER_NAME} --addon-name eks-pod-identity-agent`
+`aws eks create-addon --cluster-name {CLUSTER_NAME} --addon-name eks-pod-identity-agent`
 
 ### 1.2 Adding AWS's official LBC IAM policy (includes Gateway API actions as of recent versions)
 (https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json)
