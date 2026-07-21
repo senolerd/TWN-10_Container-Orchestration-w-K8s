@@ -61,7 +61,7 @@ Note: Normally, this IAM policy/role creation is Terraform (usually the terrafor
 
 Unlike Ingress (built into K8s core), Gateway API is CRD-based and must be installed explicitly.
 
-    `kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml`
+    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
 
 AWS-specific CRDs:
 
@@ -101,27 +101,44 @@ Gateway API support is behind a "feature gate", off by default even in current L
     apiVersion: gateway.networking.k8s.io/v1
     kind: GatewayClass
     metadata:
-    name: alb
+        name: alb
     spec:
-    controllerName: gateway.k8s.aws/alb
+        controllerName: gateway.k8s.aws/alb
 
 > **LoadBalancerConfiguration** — the AWS-specific.
 
     apiVersion: gateway.k8s.aws/v1beta1
     kind: LoadBalancerConfiguration
     metadata:
-    name: my-app-lb-config
+        name: my-app-lb-config
     spec:
-    scheme: internet-facing
-    # In production: pin subnets explicitly rather than relying on auto-discovery
-    subnets:
-        ids:
-        - subnet-XXXX
-        - subnet-YYYY
+        scheme: internet-facing
+        # In production: pin subnets explicitly rather than relying on auto-discovery
+        subnets:
+            ids:
+            - subnet-XXXX
+            - subnet-YYYY
 
 
 
-
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+    name: my-app-gateway
+    spec:
+    gatewayClassName: alb
+    infrastructure:
+        parametersRef:
+        group: gateway.k8s.aws
+        kind: LoadBalancerConfiguration
+        name: my-app-lb-config
+    listeners:
+        - name: http
+        protocol: HTTP
+        port: 80
+        allowedRoutes:
+            namespaces:
+            from: Same
 
 
 
