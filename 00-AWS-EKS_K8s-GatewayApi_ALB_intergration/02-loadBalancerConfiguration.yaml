@@ -1,0 +1,14 @@
+# A AWS Load Balancer Configuration for Gateway. It is going set the gateway whether the Gateway
+# will answer the request comming from internet.
+# 
+apiVersion: gateway.k8s.aws/v1beta1
+kind: LoadBalancerConfiguration
+metadata:
+    name: my-lb-ext-config
+spec:
+    scheme: internet-facing # the LB comes with "internal" facing as default. This config changes to internet facing.
+    # Pinning subnets explicitly rather than relying on auto-discovery
+    # subnets:
+    #    ids:
+    #    - subnet-XXXX
+    #    - subnet-YYYY

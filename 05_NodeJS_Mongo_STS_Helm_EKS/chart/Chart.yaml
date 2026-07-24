@@ -1,0 +1,7 @@
+apiVersion: v2
+name: nodejs-mongodb-on-eks
+description: ModeJS-MongoDB app for EKS
+
+type: application
+version: 0.1.1
+appVersion: "1"

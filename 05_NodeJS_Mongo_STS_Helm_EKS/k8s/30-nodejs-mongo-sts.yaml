@@ -36,7 +36,6 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
-          name: web
       - name: mongo7
         securityContext:
           runAsGroup: 999
@@ -66,15 +65,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nodejs-mongo-headless
+  name: nodejs-mongo
 spec:
-  clusterIP: None
-  # type: NodePort
+  type: ClusterIP
   selector:
     app: nodejs-mongo
   ports:
   - port: 3000
     targetPort: 3000
-    # nodePort: 31080
 
 

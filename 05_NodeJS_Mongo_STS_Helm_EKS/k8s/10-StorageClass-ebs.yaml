@@ -1,3 +1,5 @@
+# This one is alternative. Turns out the SC comes with EBS addon is good enough.
+#
 # gp3 SC instead default SC comes with Amazon EBS CSI driver for Hybrid Mode 
 # (EKS Auto Mode use different driver and provisioner)
 # ---

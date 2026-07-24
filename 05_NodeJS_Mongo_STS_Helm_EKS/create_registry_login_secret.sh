@@ -35,6 +35,7 @@ kubectl create secret docker-registry registry-secret-of-$REG_USER \
 
 if [ -f "k8s/docker_secret.yaml" ]; then
     echo "New $FILE is created"
+    cat $FILE
 else
     echo "Something went wrong and $FILE could not be created!"
 fi

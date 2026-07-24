@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.db.name }}-headless"
+  namespace: "{{ .Values.namespace }}"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: "{{ .Values.db.name }}"
+  ports:
+    - protocol: TCP
+      targetPort: {{ .Values.dbContainerPort }}
+      port: {{ .Values.dbServicePort }}

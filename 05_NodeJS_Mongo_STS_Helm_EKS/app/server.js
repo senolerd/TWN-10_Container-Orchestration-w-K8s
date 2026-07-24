@@ -5,6 +5,24 @@ let MongoClient = require('mongodb').MongoClient;
 let bodyParser = require('body-parser');
 let app = express();
 
+
+//////////////////////////////////////////////////////////////////////////
+// This part is added by me to make it a little k8s friendly. Instead of hard coded credentials
+// read from /secrets
+const mongoHost = process.env.MONGO_HOST || 'localhost';
+const mongoPort = process.env.MONGO_PORT || '27017';
+
+try {
+  // .trim() removes hidden newlines (\n) often added by text editors or Docker secrets
+  mongoUser = fs.readFileSync('/secrets/mongo-root', 'utf8').trim();
+  mongoPass = fs.readFileSync('/secrets/mongo-pass', 'utf8').trim();
+} catch (error) {
+  console.error('Dramatic Error: Could not read MongoDB credentials:', error.message);
+  process.exit(1); // Stop the server immediately if credentials are missing
+}
+////////////////////////////////////////////////////////////////////////// 
+
+
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -21,7 +39,7 @@ app.get('profile-picture', function (req, res) {
 });
 
 // use when starting application locally with node command
-let mongoUrlLocal = "mongodb://admin:password@127.0.0.1:27017";
+let mongoUrl = `mongodb://${mongoUser}:${mongoPass}@${mongoHost}:${mongoPort}`;
 
 // use when starting application as docker container, part of docker-compose
 let mongoUrlDockerCompose = "mongodb://admin:password@mongodb";
@@ -36,7 +54,7 @@ let collectionName = "users";
 app.get('get-profile', function (req, res) {
   let response = {};
   // Connect to the db using local application or docker compose variable in connection properties
-  MongoClient.connect(mongoUrlLocal, mongoClientOptions, function (err, client) {
+  MongoClient.connect(mongoUrl, mongoClientOptions, function (err, client) {
     if (err) throw err;
 
     let db = client.db(databaseName);

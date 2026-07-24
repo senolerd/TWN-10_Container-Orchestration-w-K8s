@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Values.db.name }}-sts"
+  namespace: "{{ .Values.namespace }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ .Values.db.name }}"
+  serviceName: {{ .Values.db.name }}-headless
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.db.name }}"
+    spec:
+      {{- if eq .Values.infra "AWS" }}
+      initContainers:
+      - name: fix-volume-permission
+        image: busybox
+        volumeMounts:
+          - name: "{{ .Values.db.storage.volumeName }}"
+            mountPath: /data/db 
+        command: 
+        - sh
+        - -c
+        - |
+          chown {{ .Values.db.secCtx.runAsUser }}:{{ .Values.db.secCtx.runAsGroup }} -R {{ .Values.db.storage.mountPath }}
+          chmod 700 -R {{ .Values.db.storage.mountPath }}
+      {{- end}} 
+      containers:
+      - name: "{{ .Values.db.name }}"
+        securityContext:
+            runAsUser: {{ .Values.db.secCtx.runAsUser }}
+            runAsGroup: {{ .Values.db.secCtx.runAsGroup }}
+        image: "{{ .Values.db.image }}"   
+        env: 
+          - name: MONGO_INITDB_ROOT_USERNAME_FILE
+            value: "/secrets/mongo-root"
+          - name: MONGO_INITDB_ROOT_PASSWORD_FILE
+            value: "/secrets/mongo-pw"
+          - name: MONGO_HOST
+            value: "{{ .Values.db.name }}-sts-0.{{ .Values.db.name }}-headless.{{ .Values.namespace }}.svc.cluster.local"
+          - name: MONGO_PORT
+            value: "{{ .Values.dbServicePort }}"
+        ports:
+        - containerPort: {{ .Values.dbContainerPort }}
+        volumeMounts:
+        - name: mongo-secret
+          mountPath: /secrets
+        {{- if eq .Values.infra "AWS" }}
+        - name: "{{ .Values.db.storage.volumeName }}"
+          mountPath: "{{ .Values.db.storage.mountPath }}"   
+        {{- end}}  
+      volumes:
+      - name: mongo-secret
+        secret:
+          secretName: mongo-creds
+  {{- if eq .Values.infra "AWS" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: "{{ .Values.db.storage.volumeName }}"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "gp2" # gp2 comes with aws-ebs-csi-driver addon installation in EKS hybrid mode (mean, EKS Auto Mode: Disabled )
+      resources:
+        requests:
+          storage: 5Gi
+  {{- end}} 
+
