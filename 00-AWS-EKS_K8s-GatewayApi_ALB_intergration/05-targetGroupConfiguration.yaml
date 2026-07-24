@@ -1,10 +1,10 @@
-apiVersion: gateway.k8s.aws/v1beta1
-kind: TargetGroupConfiguration
-metadata:
-  name: nodejs-mongo-tg-config
-  namespace: default
-spec:
-  targetReference:
-    name: nodejs-mongo # the service of the application
-  defaultConfiguration:
-    targetType: ip
+# apiVersion: gateway.k8s.aws/v1beta1
+# kind: TargetGroupConfiguration
+# metadata:
+#   name: nodejs-mongo-tg-config
+#   namespace: default
+# spec:
+#   targetReference:
+#     name: nodejs-mongo # the service of the application
+#   defaultConfiguration:
+#     targetType: ip # Pod IPs will become ALB's target
