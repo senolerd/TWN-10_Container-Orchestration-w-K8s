@@ -11,11 +11,14 @@ let app = express();
 // read from /secrets
 const mongoHost = process.env.MONGO_HOST || 'localhost';
 const mongoPort = process.env.MONGO_PORT || '27017';
+console.log("DB: ", mongoHost, mongoPort )
 
 try {
   // .trim() removes hidden newlines (\n) often added by text editors or Docker secrets
-  mongoUser = fs.readFileSync('/secrets/mongo-root', 'utf8').trim();
-  mongoPass = fs.readFileSync('/secrets/mongo-pass', 'utf8').trim();
+  mongoUser = fs.readFileSync('/secrets/..data/mongo-root', 'utf8').trim();
+  mongoPass = fs.readFileSync('/secrets/..data/mongo-pass', 'utf8').trim();
+  console.log("cred: ", mongoUser, mongoPass )
+
 } catch (error) {
   console.error('Dramatic Error: Could not read MongoDB credentials:', error.message);
   process.exit(1); // Stop the server immediately if credentials are missing
@@ -56,7 +59,7 @@ app.get('/get-profile', function (req, res) {
   // Connect to the db using local application or docker compose variable in connection properties
   MongoClient.connect(mongoUrl, mongoClientOptions, function (err, client) {
     if (err) throw err;
-
+    console.log("get-profile client: ", client)
     let db = client.db(databaseName);
 
     let myquery = { userid: 1 };
@@ -77,6 +80,7 @@ app.post('/update-profile', function (req, res) {
   // Connect to the db using local application or docker compose variable in connection properties
   MongoClient.connect(mongoUrl, mongoClientOptions, function (err, client) {
     if (err) throw err;
+    console.log("update-profile client: ", client)
 
     let db = client.db(databaseName);
     userObj['userid'] = 1;

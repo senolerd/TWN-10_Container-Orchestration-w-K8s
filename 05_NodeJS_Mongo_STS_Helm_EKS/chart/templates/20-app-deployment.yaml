@@ -21,6 +21,11 @@ spec:
       - name: "{{ .Values.app.name }}"
         image: "{{ .Values.app.image }}"
         imagePullPolicy: "{{ .Values.app.imgPullPolicy }}"
+        env: 
+          - name: MONGO_HOST
+            value: "{{ .Values.db.name }}-sts-0.{{ .Values.db.name }}-headless.{{ .Values.namespace }}.svc.cluster.local"
+          - name: MONGO_PORT
+            value: "{{ .Values.dbServicePort }}"        
         ports:
         - containerPort: {{ .Values.appContainerPort }}
         volumeMounts:
