@@ -9,3 +9,8 @@
 {{- if not .Values.repoUsername }} 
   {{- fail "[ERROR] Image Repo Username (repoUsername) is not set in values.yaml "}}
 {{- end}}
+
+
+{{- if and (not .Values.db.storage.className) (eq .Values.infra "AWS") }} 
+  {{- fail "[ERROR] AWS storage class should be set "}}
+{{- end}}

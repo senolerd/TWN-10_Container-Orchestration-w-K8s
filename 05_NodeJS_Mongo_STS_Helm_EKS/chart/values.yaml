@@ -30,7 +30,7 @@ db:
     runAsUser: 999 # cgr image runs mongo with
     runAsGroup: 999 # cgr image runs mongo with
   storage:
-    className: 'gp2'
+    className: ''
     volumeName: 'data-disk'
     mountPath: '/data/db'
     accessModes: [ "ReadWriteOnce" ]
