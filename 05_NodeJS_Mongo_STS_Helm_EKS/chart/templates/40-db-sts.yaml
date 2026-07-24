@@ -7,7 +7,7 @@ spec:
   selector:
     matchLabels:
       app: "{{ .Values.db.name }}"
-  serviceName: {{ .Values.db.name }}-headless
+  serviceName: "{{ .Values.db.name }}-headless"
   replicas: 1
   template:
     metadata:

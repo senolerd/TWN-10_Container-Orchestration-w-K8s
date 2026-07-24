@@ -1,0 +1,5 @@
+infra: AWS
+registryAddr: 'https://index.docker.io/v1/'
+repoUsername: ''
+repoPersonalAccessToken: '' # dckr_pat_....
+httpRouteParentRef: '' # my-alb-gateway

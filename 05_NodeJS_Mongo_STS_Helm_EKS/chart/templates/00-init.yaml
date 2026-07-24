@@ -1,0 +1,11 @@
+{{- if not .Values.repoPersonalAccessToken }} 
+  {{- fail "[ERROR] Personal Access Token (repoPersonalAccessToken) is not set in values.yaml "}}
+{{- end}}
+
+{{- if not .Values.registryAddr }} 
+  {{- fail "[ERROR] Registry Address (registryAddr) is not set in values.yaml "}}
+{{- end}}
+
+{{- if not .Values.repoUsername }} 
+  {{- fail "[ERROR] Image Repo Username (repoUsername) is not set in values.yaml "}}
+{{- end}}
