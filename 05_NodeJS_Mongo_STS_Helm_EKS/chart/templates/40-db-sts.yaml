@@ -38,7 +38,7 @@ spec:
           - name: MONGO_INITDB_ROOT_USERNAME_FILE
             value: "/secrets/mongo-root"
           - name: MONGO_INITDB_ROOT_PASSWORD_FILE
-            value: "/secrets/mongo-pw"
+            value: "/secrets/mongo-pass"
           - name: MONGO_HOST
             value: "{{ .Values.db.name }}-sts-0.{{ .Values.db.name }}-headless.{{ .Values.namespace }}.svc.cluster.local"
           - name: MONGO_PORT

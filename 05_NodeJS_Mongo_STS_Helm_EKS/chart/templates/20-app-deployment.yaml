@@ -23,3 +23,13 @@ spec:
         imagePullPolicy: "{{ .Values.app.imgPullPolicy }}"
         ports:
         - containerPort: {{ .Values.appContainerPort }}
+        volumeMounts:
+        - name: mongo-secret
+          mountPath: /secrets
+      volumes:
+      - name: mongo-secret
+        secret:
+          secretName: mongo-creds
+
+
+
