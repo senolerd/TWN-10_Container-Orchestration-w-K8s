@@ -1,16 +1,19 @@
 {{- if not .Values.repoPersonalAccessToken }} 
-  {{- fail "[ERROR] Personal Access Token (repoPersonalAccessToken) is not set in values.yaml "}}
+  {{- fail "[ERROR] Personal Access Token (repoPersonalAccessToken) is not set. "}}
 {{- end}}
 
 {{- if not .Values.registryAddr }} 
-  {{- fail "[ERROR] Registry Address (registryAddr) is not set in values.yaml "}}
+  {{- fail "[ERROR] Registry Address (registryAddr) is not set"}}
 {{- end}}
 
 {{- if not .Values.repoUsername }} 
-  {{- fail "[ERROR] Image Repo Username (repoUsername) is not set in values.yaml "}}
+  {{- fail "[ERROR] Image Repo Username (repoUsername) is not set" }}
 {{- end}}
 
-
 {{- if and (not .Values.db.storage.className) (eq .Values.infra "AWS") }} 
-  {{- fail "[ERROR] AWS storage class should be set "}}
+  {{- fail "[ERROR] AWS storage class name (db.storage.className) should be set" }}
+{{- end}}
+
+{{- if not .Values.app.image }} 
+  {{- fail "[ERROR] Application image (app.image) is not set. If you don't have, Containerfile is exist to make one. Chap chap!"}}
 {{- end}}

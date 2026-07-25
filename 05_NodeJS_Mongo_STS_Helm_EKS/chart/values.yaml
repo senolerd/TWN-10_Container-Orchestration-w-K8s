@@ -15,7 +15,7 @@ dbServicePort: 27017
 
 app:
   name: 'nodejs-mongo'
-  image: 'docker.io/alkol/nodejs-mongodb:v12'
+  image: '' #docker.io/alkol/nodejs-mongodb:v12
   imgPullPolicy: 'Always'
   replica: 1
 
