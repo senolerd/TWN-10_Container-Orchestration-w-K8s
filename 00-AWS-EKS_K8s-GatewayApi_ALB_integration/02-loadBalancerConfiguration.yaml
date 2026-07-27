@@ -7,8 +7,12 @@ metadata:
     name: my-lb-ext-config
 spec:
     scheme: internet-facing # the LB comes with "internal" facing as default. This config changes to internet facing.
+    # listenerConfigurations:
+    #     - protocolPort: HTTPS:443
+    #       certificates: ["arn:aws:acm:us-east-1:XXXXXXXXXXXX:certificate/f44c21c2-e4c0-4917-9faf-e7159d91747d"]
     # Pinning subnets explicitly rather than relying on auto-discovery
     # subnets:
     #    ids:
     #    - subnet-XXXX
     #    - subnet-YYYY
+

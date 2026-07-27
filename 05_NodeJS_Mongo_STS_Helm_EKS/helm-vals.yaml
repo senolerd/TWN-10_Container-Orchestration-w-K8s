@@ -3,6 +3,8 @@ registryAddr: 'https://index.docker.io/v1/'
 repoUsername: ''
 repoPersonalAccessToken: '' # dckr_pat_....
 httpRouteParentRef: '' # my-alb-gateway
+app:
+  image: '' # 'docker.io/alkol/nodejs-mongodb:v12'
 db:
   storage:
     className: '' # gp2 

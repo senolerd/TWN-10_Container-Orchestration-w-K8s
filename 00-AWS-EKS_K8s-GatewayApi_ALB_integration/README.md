@@ -5,7 +5,7 @@ AWS Load Balancer Controller (LBC) the K8s Gateway Api Controller is reached GA 
 
 The path will be followed;
 
-1. IAM trust for the controller 
+1. IAM trust for the controller (Create worker nodes after Stage 1)
 2. Install Gateway API CRDs
 3. Install AWS Load Balancer Controller
 4. GatewayClass → Gateway → HTTPRoute
@@ -67,13 +67,13 @@ Unlike Ingress (built into K8s core), Gateway API is CRD-based and must be insta
 
     kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/standard-install.yaml
     kubectl apply --server-side=true -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/experimental-install.yaml
-    (experimental is TCPRoute, UDPRoute, TLSRoute of NLBGatewayAPI of L4 routing NLB. Just a superset of standard, harmless. 
+    (Don't worry about errors for second command. Experimental is TCPRoute, UDPRoute, TLSRoute of NLBGatewayAPI of L4 routing NLB. Just a superset of standard, harmless. 
     Maybe I would like to try those when the cluster ready, after I understand ALB, and super bored looking trouble. 
     It gave some errors while applying experimental because some of the CRDs not allowed with experimentals, i ignore errors for now)
 
 AWS-specific CRDs:
 
-    will come with Helm install for aws-load-balancer-controller
+    They will come with Helm install for aws-load-balancer-controller
 
 TargetGroupConfiguration, LoadBalancerConfiguration, ListenerRuleConfiguration — AWS-specific extensions, bridge Gateway API's cloud-agnostic model into ALB-specific settings (subnets, WAF, ACM certs, etc).
 
@@ -84,7 +84,7 @@ TargetGroupConfiguration, LoadBalancerConfiguration, ListenerRuleConfiguration �
     helm repo add eks https://aws.github.io/eks-charts
     helm repo update
 
-    helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
+    helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
     --version 3.4.2 \
     -n kube-system \
     --set clusterName=CLUSTER_NAME \
@@ -95,10 +95,12 @@ TargetGroupConfiguration, LoadBalancerConfiguration, ListenerRuleConfiguration �
     --set enableServiceMutatorWebhook=false \
     --set-json 'featureGates={"ALBGatewayAPI":true}'
 
-    helm upgrade aws-load-balancer-controller eks/aws-load-balancer-controller \
+Mine was like; 
+
+    helm upgrade --install aws-load-balancer-controller eks/aws-load-balancer-controller \
     --version 3.4.2 \
     -n kube-system \
-    --set clusterName=test-eks \
+    --set clusterName=myeks \
     --set vpcId=vpc-04c88d4b577826fa3 \
     --set region=us-east-1 \
     --set serviceAccount.create=true \
@@ -131,14 +133,17 @@ Gateway API support is behind a "feature gate", off by default even in current L
     metadata:
         name: my-app-lb-config
     spec:
-        scheme: internet-facing # the LB comes with internal facing as default. This config manifest with this scheme settings, becomes internet facing.
+        scheme: internet-facing # the LB comes with "internal" facing as default. This config changes to internet facing.
+        # listenerConfigurations:
+        #     - protocolPort: HTTPS:443
+        #       certificates: ["arn:aws:acm:us-east-1:XXXXXXXXXXXX:certificate/f44c21c2-e4c0-4917-9faf-e7159d91747d"]
         # Pinning subnets explicitly rather than relying on auto-discovery
         # subnets:
         #    ids:
         #    - subnet-XXXX
         #    - subnet-YYYY
 
-> **Gateway**:
+> **Gateway**: (this one provisions a ALB (cha-ching!))
 
     apiVersion: gateway.networking.k8s.io/v1
     kind: Gateway
@@ -157,9 +162,15 @@ Gateway API support is behind a "feature gate", off by default even in current L
             port: 80
             allowedRoutes:
                 namespaces:
-                    from: Same
+                    from: All
+            # - name: https
+            # protocol: HTTPS
+            # port: 443
+            # allowedRoutes:
+            #     namespaces:
+            #     from: All                  
 
-> **HTTPRoute** — Example HTTPRoute to points at application's Service:
+> **HTTPRoute** — Example HTTPRoute to points at application's Service (Application spesific. Shown as an example):
 
     apiVersion: gateway.networking.k8s.io/v1
     kind: HTTPRoute
@@ -177,7 +188,7 @@ Gateway API support is behind a "feature gate", off by default even in current L
             - name: my-app-svc  # the service of the application
                 port: 3000
 
-> **TargetGroupConfiguration** — set target type to ip via TargetGroupConfiguration (one per STS/Deployment service):
+> **TargetGroupConfiguration** — set target type to ip via TargetGroupConfiguration (one per STS/Deployment service) (Application spesific. Shown as an example):
 
     apiVersion: gateway.k8s.aws/v1beta1
     kind: TargetGroupConfiguration
@@ -198,11 +209,8 @@ Apply in order (GatewayClass → LoadBalancerConfiguration → Gateway → HTTPR
 At this point things should be done. To verify;
 
     kubectl get gatewayclass alb          # ACCEPTED: True
-    kubectl get gateway my-app-gateway    # PROGRAMMED: True, look for an address
+    kubectl get gateway my-app-gateway    # PROGRAMMED: True ("Unknown" while provisioning), look for an address
     kubectl get httproute my-app-route -n default
-
-
-
 
 
 

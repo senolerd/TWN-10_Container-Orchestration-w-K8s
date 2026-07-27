@@ -1,9 +1,9 @@
 ## NodeJS with MongoDB on AWS EKS using AWS ALB via AWS LBC
+
 This sample/simple application NodeJs/MongoDB is planned to run on AWS EKS with, Gateway API (not Ingress), AWS PVC CNI, EBS CSI, AWS LBC, AWS ALB . 
 (Yes, Amazon DocumentDB and AWS ECR are exist)
 
 This document assumes the first directory about setting infra of EKS (00-AWS-EKS_K8s-GatewayApi_ALB_intergration) is read.
-
 
 #### EKS cluster: 
 - Set Normal mode, not Auto mode.
@@ -12,7 +12,6 @@ This document assumes the first directory about setting infra of EKS (00-AWS-EKS
 - > kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true\
     for bypassing IP limitation. VPC should be bigger more than /24, lets make it /16
 - GatewayClass, LoadBalancerConfiguration and Gateway should be set according to 00-AWS-EKS_K8s-GatewayApi_ALB_intergration's README.md
-
 
 ## Manual Installation
 #### Important TODOs before starting:
@@ -24,11 +23,9 @@ This document assumes the first directory about setting infra of EKS (00-AWS-EKS
     - spec.parentRefs.name matches with the Gateway name
     - spec.rules.matches.backendRefs.name matches witg the applications service name
 
-
-
 ## Helm Chart Installation
 
-Expected resources at the cluster are; GatewayClass and Gateway. For helper details, "00-AWS-EKS_K8s-GatewayApi_ALB_intergration" can be looked up for creating a "gatewayClass, loadBalancerConfiguration and gateway". also for EBS CNI addon for ebs storageClass (gp2) that MongoDB is going to need.
+Expected resources at the cluster are; GatewayClass and Gateway. For helper details, "00-AWS-EKS_K8s-GatewayApi_ALB_intergration" can be looked up for creating a "gatewayClass, loadBalancerConfiguration and gateway". also for EBS CSI addon for ebs storageClass (gp2) that MongoDB is going to need.
 
 - Content of helm-vals.yaml
 
