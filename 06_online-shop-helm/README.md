@@ -4,7 +4,7 @@
 ### About the project:
 **Google Online Boutique**: 
     
-    "Online Boutique is a cloud-first microservices demo application. The application is a web-based e-commerce app where users can browse items, add them to the cart, and purchase them."
+"Online Boutique is a cloud-first microservices demo application. The application is a web-based e-commerce app where users can browse items, add them to the cart, and purchase them."
 
 Project lives at https://github.com/GoogleCloudPlatform/microservices-demo.
 
@@ -37,7 +37,11 @@ To enable nodePort for the deployment;
 
 To enable loadbalancer for the deployment;
 
-    helm upgrade --install --set isLbEnabled=true --set gateway="gateway-ext" --set platform="AWS" my-release helm-chart
+    helm upgrade --install \
+      --set isLbEnabled=true \
+      --set gateway="gateway-ext" \
+      --set platform="AWS" \
+      my-release helm-chart
 
 To enable loadbalancer for the deployment with specific hostname;
 
