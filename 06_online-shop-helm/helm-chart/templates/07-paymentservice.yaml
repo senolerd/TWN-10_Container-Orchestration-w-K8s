@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.paymentservice.name}}
+  labels:
+    app: {{.Values.paymentservice.name}}
+spec:
+  replicas: {{.Values.paymentservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.paymentservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.paymentservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.paymentservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.paymentservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.paymentservice.port | quote }}
+        {{- range $key, $value := .Values.paymentservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.paymentservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.paymentservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.paymentservice.port }}
+      targetPort: {{ .Values.paymentservice.port }}

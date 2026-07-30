@@ -44,7 +44,7 @@ spec:
         volumeMounts:
         - name: mongo-secret
           mountPath: /secrets
-        {{- if eq .Values.infra "AWS" }}
+        {{- if .Values.db.storage.className }}
         - name: "{{ .Values.db.storage.volumeName }}"
           mountPath: "{{ .Values.db.storage.mountPath }}"   
         {{- end}}  
@@ -52,7 +52,7 @@ spec:
       - name: mongo-secret
         secret:
           secretName: mongo-creds
-  {{- if eq .Values.infra "AWS" }}
+  {{- if .Values.db.storage.className }}
   volumeClaimTemplates:
   - metadata:
       name: "{{ .Values.db.storage.volumeName }}"

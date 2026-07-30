@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.adservice.name}}
+  labels:
+    app: {{.Values.adservice.name}}
+spec:
+  replicas: {{.Values.adservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.adservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.adservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.adservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.adservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.adservice.port | quote }}
+        {{- range $key, $value := .Values.adservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.adservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.adservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.adservice.port }}
+      targetPort: {{ .Values.adservice.port }}

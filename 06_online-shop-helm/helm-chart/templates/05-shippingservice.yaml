@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.shippingservice.name}}
+  labels:
+    app: {{.Values.shippingservice.name}}
+spec:
+  replicas: {{.Values.shippingservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.shippingservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.shippingservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.shippingservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.shippingservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.shippingservice.port | quote }}
+        {{- range $key, $value := .Values.shippingservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.shippingservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.shippingservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.shippingservice.port }}
+      targetPort: {{ .Values.shippingservice.port }}

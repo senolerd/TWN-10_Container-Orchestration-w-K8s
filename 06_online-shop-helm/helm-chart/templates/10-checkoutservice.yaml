@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.checkoutservice.name}}
+  labels:
+    app: {{.Values.checkoutservice.name}}
+spec:
+  replicas: {{.Values.checkoutservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.checkoutservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.checkoutservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.checkoutservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.checkoutservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.checkoutservice.port | quote }}
+        {{- range $key, $value := .Values.checkoutservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.checkoutservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.checkoutservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.checkoutservice.port }}
+      targetPort: {{ .Values.checkoutservice.port }}

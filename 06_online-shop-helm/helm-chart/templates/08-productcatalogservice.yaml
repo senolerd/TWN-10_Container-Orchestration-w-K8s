@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.recommendationservice.name}}
+  labels:
+    app: {{.Values.recommendationservice.name}}
+spec:
+  replicas: {{.Values.recommendationservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.recommendationservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.recommendationservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.recommendationservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.recommendationservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.recommendationservice.port | quote }}
+        {{- range $key, $value := .Values.recommendationservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.recommendationservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.recommendationservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.recommendationservice.port }}
+      targetPort: {{ .Values.recommendationservice.port }}

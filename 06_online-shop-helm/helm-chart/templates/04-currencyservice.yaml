@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.currencyservice.name}}
+  labels:
+    app: {{.Values.currencyservice.name}}
+spec:
+  replicas: {{.Values.currencyservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.currencyservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.currencyservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.currencyservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.currencyservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.currencyservice.port | quote }}
+        {{- range $key, $value := .Values.currencyservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.currencyservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.currencyservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.currencyservice.port }}
+      targetPort: {{ .Values.currencyservice.port }}

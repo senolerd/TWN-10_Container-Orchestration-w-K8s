@@ -1,3 +1,4 @@
+{{- if and (eq .Values.infra "AWS") .Values.isLbEnabled  }}
 apiVersion: gateway.k8s.aws/v1beta1
 kind: TargetGroupConfiguration
 metadata:
@@ -8,3 +9,4 @@ spec:
     name: "{{ .Values.app.name }}" # app' service name that httpRoute use as backendRef
   defaultConfiguration:
     targetType: ip # Pod IPs are ALB's target. Other ootion is "instance" which targets ec2 instances. Services should be set to NodePort
+{{- end}} 

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.emailservice.name}}
+  labels:
+    app: {{.Values.emailservice.name}}
+spec:
+  replicas: {{.Values.emailservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.emailservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.emailservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.emailservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.emailservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.emailservice.port | quote }}
+        {{- range $key, $value := .Values.emailservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.emailservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.emailservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.emailservice.port }}
+      targetPort: {{ .Values.emailservice.port }}

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: online-shopping
+description: A Helm chart for online-shopping microservices
+type: application
+version: 0.1.0
+appVersion: "v0.10.6"
+

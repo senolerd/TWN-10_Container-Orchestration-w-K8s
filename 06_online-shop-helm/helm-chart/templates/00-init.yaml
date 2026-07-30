@@ -1,0 +1,3 @@
+{{- if and .Values.isLbEnabled ( not .Values.gateway) }} 
+    {{ fail "\n\nLoadBalancer is enabled but gateway is not set. To set, either edit in values.yaml or --set gateway='my-gateway-ext' on running commnand. \n" }}
+{{- end}}

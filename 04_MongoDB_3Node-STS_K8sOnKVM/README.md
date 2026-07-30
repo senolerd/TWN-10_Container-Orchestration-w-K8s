@@ -1,7 +1,7 @@
 
 # 3 Node MongoDB cluster and Mongo Express over KVM local K8s cluster 
 
-## STAGE 1 - PREPARE NFS 
+## STAGE 1 - Preparing NFS Server and Share
 NFS server is on dedicated NFS server
 
     $ sudo dnf install -y nfs-utils

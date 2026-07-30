@@ -1,0 +1,106 @@
+namespace: default
+imageRegistry: "us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo" # >= v0.10.2 
+# imageRegistry: "gcr.io/google-samples/microservices-demo/cartservice" # < v0.10.2 
+
+# To enable nodeNort for frontend give a port number between 30000-32767
+nodePort: ""
+
+# Setting s for Gateway API. Expects the a gateway resource is defined. 
+isLbEnabled: false
+## AWS or KVM. AWS will cause to  TargetGroupConfiguration load.
+platform: KVM 
+gateway: "" # "gateway-ext"
+## It hostname is not given request to ip for url will answer to frontend service
+hostname: "" # 'test.mydomain.xyz'
+
+
+redis:
+  name: redis-cart
+  image: redis:alpine
+  replicas: 1
+  port: 6379
+  envVar:
+
+cartservice:
+  name: cartservice
+  image: 
+  replicas: 1
+  port: 7070
+  envVar:
+    DISABLE_PROFILER: 1
+    REDIS_ADDR: "redis-cart:6379"
+
+adservice:
+  name: adservice
+  replicas: 1
+  port: 9555
+  envVar:
+
+currencyservice:
+  name: currencyservice
+  replicas: 1
+  port: 7000
+  envVar:
+    DISABLE_PROFILER: 1
+
+shippingservice:
+  name: shippingservice
+  replicas: 1
+  port: 50051
+  envVar:
+
+emailservice:
+  name: emailservice
+  replicas: 1
+  port: 8080
+  envVar:
+
+paymentservice:
+  name: paymentservice
+  replicas: 1
+  port: 50051
+  envVar:
+    DISABLE_PROFILER: 1
+
+productcatalogservice:
+  name: productcatalogservice
+  replicas: 1
+  port: 3550
+  envVar:
+    DISABLE_PROFILER: 1
+
+recommendationservice:
+  name: recommendationservice
+  replicas: 1
+  port: 8080
+  envVar:
+    DISABLE_PROFILER: 1
+    PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+
+checkoutservice:
+  name: checkoutservice
+  replicas: 1
+  port: 5050
+  envVar:
+    PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+    SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+    PAYMENT_SERVICE_ADDR: "paymentservice:50051"
+    EMAIL_SERVICE_ADDR: "emailservice:5000"
+    CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+    CART_SERVICE_ADDR: "cartservice:7070"
+
+frontend:
+  name: frontend
+  replicas: 1
+  port: 8080
+  nodePort: ""
+  envVar:
+    PRODUCT_CATALOG_SERVICE_ADDR: "productcatalogservice:3550"
+    CURRENCY_SERVICE_ADDR: "currencyservice:7000"
+    CART_SERVICE_ADDR: "cartservice:7070"
+    RECOMMENDATION_SERVICE_ADDR: "recommendationservice:8080"
+    SHIPPING_SERVICE_ADDR: "shippingservice:50051"
+    CHECKOUT_SERVICE_ADDR: "checkoutservice:5050"
+    AD_SERVICE_ADDR: "adservice:9555"
+    ENABLE_ASSISTANT: false
+    SHOPPING_ASSISTANT_SERVICE_ADDR: "localhost:0000"

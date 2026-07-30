@@ -11,7 +11,7 @@ The path will be followed;
 4. GatewayClass → Gateway → HTTPRoute
 5. Verify 
 
-#### By-Passing IP limitation for fresh EKS
+#### By-Passing IP limitation of fresh EKS
 By-Passing small instance IP limitation for EKS. It should be done before worker nodes created. If the worker nodes are deployed, should be deleted and created again.
 
     kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true

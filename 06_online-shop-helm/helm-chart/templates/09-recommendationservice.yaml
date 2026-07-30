@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.productcatalogservice.name}}
+  labels:
+    app: {{.Values.productcatalogservice.name}}
+spec:
+  replicas: {{.Values.productcatalogservice.replicas}}
+  selector:
+    matchLabels:
+      app: {{.Values.productcatalogservice.name}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.productcatalogservice.name}}
+    spec:
+      containers:
+      - name: app
+        image: "{{ .Values.imageRegistry }}/{{ .Values.productcatalogservice.name }}:{{ .Chart.AppVersion }}"
+        ports:
+        - containerPort: {{.Values.productcatalogservice.port}}
+        env:
+        - name: PORT
+          value: {{ .Values.productcatalogservice.port | quote }}
+        {{- range $key, $value := .Values.productcatalogservice.envVar }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.productcatalogservice.name}}
+spec:
+  type: ClusterIP           
+  selector:
+    app: {{.Values.productcatalogservice.name}}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.productcatalogservice.port }}
+      targetPort: {{ .Values.productcatalogservice.port }}
