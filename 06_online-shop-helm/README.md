@@ -10,7 +10,7 @@ Project lives at https://github.com/GoogleCloudPlatform/microservices-demo.
 
 ### Usage instructions:
 
-The chart is ready to use on **K8s Gateway API**_**  on AWS EKS+ALB. Since AWS needs some extra settings to adjust Target Group with ALB loadbalancer; 
+The chart is ready to use on **K8s Gateway API**  on AWS EKS+ALB. Since AWS needs some extra settings to adjust Target Group with ALB loadbalancer; 
 
 #### NodePort accessable deployment
 - "nodePort" is empty by default. It can be set in values.yaml or `--set nodePort=(30000:32767)` will make the fronend accessable via any k8s node ip and port.
