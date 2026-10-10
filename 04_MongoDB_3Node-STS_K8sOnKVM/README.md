@@ -79,4 +79,3 @@ login username and password
 
     http://{any_k8s_node}:30081
 
-    

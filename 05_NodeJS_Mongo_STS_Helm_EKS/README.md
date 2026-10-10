@@ -47,4 +47,3 @@ To verify whats going on with the ALB:
     kubectl get gatewayclass {gateway_class_name} # ACCEPTED: True
     kubectl get gateway {gateway_name} # PROGRAMMED: True, look for an address
     kubectl get httproute {httpdRote name} 
-    
