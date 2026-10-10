@@ -78,3 +78,5 @@ If the "05-mongo-express.yaml" is applied, the mongo-express will be accessable 
 login username and password
 
     http://{any_k8s_node}:30081
+
+    

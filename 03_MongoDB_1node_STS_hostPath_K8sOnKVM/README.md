@@ -5,3 +5,4 @@ the volume mount waits until the Pod is ready. Pod provision sequence looks at t
 spawns the pod at that node. When the Pod is ready, volume is being mounted. So, the STS locked based on its PV!
 
 
+
